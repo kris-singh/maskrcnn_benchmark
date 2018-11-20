@@ -45,6 +45,9 @@ def do_train(
     checkpoint_period,
     arguments,
 ):
+    print("-------------------------------------------------------------------------------------")
+    print("Inside Training Yay")
+    print("-------------------------------------------------------------------------------------")
     logger = logging.getLogger("maskrcnn_benchmark.trainer")
     logger.info("Start training")
     meters = MetricLogger(delimiter="  ")
@@ -82,7 +85,10 @@ def do_train(
         eta_seconds = meters.time.global_avg * (max_iter - iteration)
         eta_string = str(datetime.timedelta(seconds=int(eta_seconds)))
 
-        if iteration % 20 == 0 or iteration == (max_iter - 1):
+        if iteration % 2 == 0 or iteration == (max_iter - 1):
+            print("-----------------------------------------------------")
+            print("inside logging")
+            print("-----------------------------------------------------")
             logger.info(
                 meters.delimiter.join(
                     [

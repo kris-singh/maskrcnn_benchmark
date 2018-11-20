@@ -10,11 +10,11 @@ import os
 
 import pdb
 
-class COCODataset(torchvision.datasets.coco.CocoDetection):
+class ModaNetDataset(torchvision.datasets.coco.CocoDetection):
     def __init__(
-        self, ann_file, root, remove_images_without_annotations, transforms=None
+        self, ann_file, root, remove_images_without_annotations, remove_annotation_without_images=False, transforms=None
     ):
-        super(COCODataset, self).__init__(root, ann_file)
+        super(ModaNetDataset, self).__init__(root, ann_file)
 
         # sort indices for reproducible results
         self.ids = sorted(self.ids)
@@ -25,6 +25,12 @@ class COCODataset(torchvision.datasets.coco.CocoDetection):
                 img_id
                 for img_id in self.ids
                 if len(self.coco.getAnnIds(imgIds=img_id, iscrowd=None)) > 0
+            ]
+        if remove_annotation_without_images:
+            self.ids =[
+                img_id
+                for img_id in self.ids
+                if os.path.exists(os.path.join(self.root, self.coco.loadImgs(img_id)[0]['file_name']))
             ]
 
         self.json_category_id_to_contiguous_id = {
@@ -37,8 +43,7 @@ class COCODataset(torchvision.datasets.coco.CocoDetection):
         self.transforms = transforms
 
     def __getitem__(self, idx):
-        img, anno = super(COCODataset, self).__getitem__(idx)
-        print(self.root)
+        img, anno = super(ModaNetDataset, self).__getitem__(idx)
         # filter crowd annotations
         # TODO might be better to add an extra field
         anno = [obj for obj in anno if obj["iscrowd"] == 0]
@@ -46,7 +51,6 @@ class COCODataset(torchvision.datasets.coco.CocoDetection):
         boxes = [obj["bbox"] for obj in anno]
         boxes = torch.as_tensor(boxes).reshape(-1, 4)  # guard against no boxes
         target = BoxList(boxes, img.size, mode="xywh").convert("xyxy")
-        pdb.set_trace()
         classes = [obj["category_id"] for obj in anno]
         classes = [self.json_category_id_to_contiguous_id[c] for c in classes]
         classes = torch.tensor(classes)

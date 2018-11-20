@@ -36,9 +36,15 @@ def build_dataset(dataset_list, transforms, dataset_catalog, is_train=True):
         # during training
         if data["factory"] == "COCODataset":
             args["remove_images_without_annotations"] = is_train
+        if data["factory"] == "ModaNetDataset":
+            args["remove_images_without_annotations"] = is_train
+            args["remove_annotation_without_images"] = is_train
         args["transforms"] = transforms
         # make dataset from factory
-        dataset = factory(**args)
+        if data["factory"] == "COCODataset":
+            dataset = factory(**args)
+        if data["factory"] == "ModaNetDataset":
+            dataset = factory(**args)
         datasets.append(dataset)
 
     # for testing, return a list of datasets

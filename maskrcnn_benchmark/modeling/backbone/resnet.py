@@ -33,6 +33,16 @@ StageSpec = namedtuple(
 # -----------------------------------------------------------------------------
 # Standard ResNet models
 # -----------------------------------------------------------------------------
+# ReseNet-34(including all stages)
+ResNet34StagesTo5 = tuple(
+    StageSpec(index=i, block_count=c, return_features=r)
+    for (i, c, r) in ((1, 3, False), (2, 4, False), (3, 6, False), (4, 3, True))
+)
+# ResNet-34 up to stage 4 (excludes stage 5)
+ResNet34StagesTo5 = tuple(
+    StageSpec(index=i, block_count=c, return_features=r)
+    for (i, c, r) in ((1, 3, False), (2, 4, False), (3, 6, False))
+)
 # ResNet-50 (including all stages)
 ResNet50StagesTo5 = tuple(
     StageSpec(index=i, block_count=c, return_features=r)

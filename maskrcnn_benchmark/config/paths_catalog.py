@@ -22,6 +22,16 @@ class DatasetCatalog(object):
             "coco/annotations/instances_valminusminival2014.json",
         ),
     }
+    DATASETS = {
+        "modanet_train":(
+            "modanet/images/train",
+            "modanet/annotations/modanet2018_instances_train.json"
+        ),
+        "modanet_test":(
+            "modanet/images/test",
+            "modanet/annotations/modanet2018_instances_test.json"
+        )
+    }
 
     @staticmethod
     def get(name):
@@ -36,7 +46,13 @@ class DatasetCatalog(object):
                 factory="COCODataset",
                 args=args,
             )
-        raise RuntimeError("Dataset not available: {}".format(name))
+        if "modanet" in name:
+            data_dir = DatasetCatalog.DATA_DIR
+            attrs = DatasetCatalog.DATASETS[name]
+            args = dict(root=os.path.join(data_dir, attrs[0]), ann_file=os.path.join(data_dir, attrs[1]), )
+            return dict(factory="ModaNetDataset", args=args)
+
+            raise RuntimeError("Dataset not available: {}".format(name))
 
 
 class ModelCatalog(object):
