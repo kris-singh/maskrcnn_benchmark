@@ -26,7 +26,8 @@ def build_dataset(dataset_list, transforms, dataset_catalog, is_train=True):
     """
     if not isinstance(dataset_list, (list, tuple)):
         raise RuntimeError(
-                "dataset_list should be a list of strings, got {}".format(dataset_list))
+            "dataset_list should be a list of strings, got {}".format(dataset_list)
+        )
     datasets = []
     for dataset_name in dataset_list:
         data = dataset_catalog.get(dataset_name)
@@ -39,6 +40,8 @@ def build_dataset(dataset_list, transforms, dataset_catalog, is_train=True):
         if data["factory"] == "ModaNetDataset":
             args["remove_images_without_annotations"] = is_train
             args["remove_annotation_without_images"] = is_train
+        if data["factory"] == "PascalVOCDataset":
+            args["use_difficult"] = not is_train
         args["transforms"] = transforms
         # make dataset from factory
         if data["factory"] == "COCODataset":
@@ -101,7 +104,9 @@ def make_batch_data_sampler(
             sampler, images_per_batch, drop_last=False
         )
     if num_iters is not None:
-        batch_sampler = samplers.IterationBasedBatchSampler(batch_sampler, num_iters, start_iter)
+        batch_sampler = samplers.IterationBasedBatchSampler(
+            batch_sampler, num_iters, start_iter
+        )
     return batch_sampler
 
 
