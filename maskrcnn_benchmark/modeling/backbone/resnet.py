@@ -260,7 +260,7 @@ class BottleneckWithFixedBatchNorm(nn.Module):
         self.bn3 = FrozenBatchNorm2d(out_channels)
 
     def forward(self, x):
-        residual = x
+        identity = x
 
         out = self.conv1(x)
         out = self.bn1(out)
@@ -274,9 +274,9 @@ class BottleneckWithFixedBatchNorm(nn.Module):
         out = self.bn3(out0)
 
         if self.downsample is not None:
-            residual = self.downsample(x)
+            identity = self.downsample(x)
 
-        out += residual
+        out += identity
         out = F.relu_(out)
 
         return out
