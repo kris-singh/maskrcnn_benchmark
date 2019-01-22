@@ -49,9 +49,11 @@ class Checkpointer(object):
         torch.save(data, save_file)
         self.tag_last_checkpoint(save_file)
 
-    def load(self, f=None):
-        if self.has_checkpoint():
+    def load(self, f=None, force=False):
+        if self.has_checkpoint() and not force:
             # override argument with existing checkpoint
+            self.logger.warn("Using Last Saved Checkpoint instead of {}. "\
+                             "If you want to use the passed file pass force=True".format(f))
             f = self.get_checkpoint_file()
         if not f:
             # no checkpoint could be found
@@ -120,7 +122,7 @@ class DetectronCheckpointer(Checkpointer):
             paths_catalog = import_file(
                 "maskrcnn_benchmark.config.paths_catalog", self.cfg.PATHS_CATALOG, True
             )
-            catalog_f = paths_catalog.ModelCatalog.get(f[len("catalog://") :])
+            catalog_f = paths_catalog.ModelCatalog.get(f[len("catalog://"):])
             self.logger.info("{} points to {}".format(f, catalog_f))
             f = catalog_f
         # download url files
